@@ -14,7 +14,7 @@ user = {"username": "automation", "email": "automation@test.com", "password": "T
 async def set_up():
     """ Fixture to access the website """
     async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(headless=False)
+        browser = await playwright.chromium.launch()
         page = await browser.new_page()
         await page.goto(URL)
         yield page
