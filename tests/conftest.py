@@ -42,6 +42,10 @@ async def set_up_with_trace():
         page = await context.new_page()
         await page.goto(URL)
 
+        await page.click(Navbar.SIGN_IN_LNK)
+        login_page = Login(page)
+        await login_page.login_with_credentials(user["email"], user["password"])
+
         yield page
 
         await context.tracing.stop(path="trace.zip")

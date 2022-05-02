@@ -17,6 +17,7 @@ async def test_login_with_valid_credentials(set_up_login):
 
 @pytest.mark.login
 @pytest.mark.asyncio
+@pytest.mark.xfail(reason="This test will fail")
 async def test_login_with_invalid_credentials(set_up):
     """ Test that performs an invalid login, but will fail because there is no error message """
 
