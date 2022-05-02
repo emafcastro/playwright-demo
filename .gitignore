@@ -1,0 +1,8 @@
+.idea
+.pytest_cache
+trace.zip
+test_theworld_async.py
+test_example_async.py
+__pycache__/
+annotations.txt
+report.html
