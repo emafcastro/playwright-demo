@@ -1,6 +1,5 @@
 import pytest
 from playwright.async_api import async_playwright
-from playwright.sync_api import Page
 from pages.home_login import Login, Navbar
 
 # URL = 'http://127.0.0.1:8080'
@@ -35,7 +34,7 @@ async def set_up_login(set_up):
 @pytest.mark.asyncio
 async def set_up_with_trace():
     async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(headless=False)
+        browser = await playwright.chromium.launch()
         context = await browser.new_context()
         await context.tracing.start(screenshots=True, snapshots=True, sources=True)
 

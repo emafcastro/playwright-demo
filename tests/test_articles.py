@@ -40,13 +40,14 @@ async def test_like_an_article(set_up_login):
 
 
 @pytest.mark.asyncio
-async def test_user_can_leave_a_comment(set_up):
+async def test_user_can_leave_a_comment(set_up_login):
     comment = "Amazing article "+str(time.time())
 
-    page = set_up
+    page = set_up_login
     await page.wait_for_load_state()
 
     await page.locator(Home.TITLE_LIST).nth(0).click()
+    await page.wait_for_load_state()
     await page.fill(ArticleDetail.COMMENT_TXT, comment)
     await page.click(ArticleDetail.POST_COMMENT_BTN)
 
