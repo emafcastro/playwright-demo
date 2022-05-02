@@ -47,7 +47,7 @@ async def test_user_can_leave_a_comment(set_up_login):
     await page.wait_for_load_state()
 
     await page.locator(Home.TITLE_LIST).nth(0).click()
-    await page.wait_for_load_state()
+    await page.wait_for_selector(ArticleDetail.COMMENT_TXT)
     await page.fill(ArticleDetail.COMMENT_TXT, comment)
     await page.click(ArticleDetail.POST_COMMENT_BTN)
 
