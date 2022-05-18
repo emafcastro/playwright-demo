@@ -1,50 +1,68 @@
 import pytest
-from playwright.async_api import async_playwright
 from pages.home_login import Login, Navbar
+from playwright.sync_api import Playwright, sync_playwright, Page, BrowserContext
 
-# URL = 'http://127.0.0.1:8080'
-URL = "https://mits-gossau.github.io/event-driven-web-components-realworld-example-app"
-
+# URL = "https://realworld-djangoapp.herokuapp.com"
+URL = "http://localhost:8000"
 user = {"username": "automation", "email": "automation@test.com", "password": "Test1234"}
 
+# TODO: Move user dictionary to a json file outside
+
+# TODO: Investigate how to apply a base_url
+
+# TODO: Investigate a best way to implement fixtures
+
+
+""" End to End fixtures """
+
 
 @pytest.fixture()
-@pytest.mark.asyncio
-async def set_up():
+def set_up(context: BrowserContext):
     """ Fixture to access the website """
-    async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch()
-        page = await browser.new_page()
-        await page.goto(URL)
+    # TODO: Check how can other browsers be implemented
+    page = context.new_page()
+    page.goto(URL)
+    yield page, context
+
+
+@pytest.fixture()
+def set_up_login(set_up):
+    """ Fixture to log in with credentials """
+    page, context = set_up
+
+    # page.on("request", lambda request: print(">>", request.method, request.url))
+    # page.on("response", lambda response: print("<<", response.status, response.url))
+
+    page.locator(Navbar.SIGN_IN_LNK).click()
+    login_page = Login(page)
+    login_page.login_with_credentials(user["email"], user["password"])
+    page.wait_for_selector("text=Sign Out")
+    yield page, context
+
+
+@pytest.fixture()
+def set_up_with_trace():
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=False)
+        context = browser.new_context()
+        context.tracing.start(screenshots=True, snapshots=True, sources=True)
+
+        page = context.new_page()
+        page.goto(URL)
+
+        page.click(Navbar.SIGN_IN_LNK)
+        login_page = Login(page)
+        login_page.login_with_credentials(user["email"], user["password"])
+        page.wait_for_selector("text=Sign Out")
+
         yield page
 
+        context.tracing.stop(path="trace.zip")
+
 
 @pytest.fixture()
-@pytest.mark.asyncio
-async def set_up_login(set_up):
-    """ Fixture to log in with credentials """
-    page = set_up
-    await page.click(Navbar.SIGN_IN_LNK)
-    login_page = Login(page)
-    await login_page.login_with_credentials(user["email"], user["password"])
+def get_api_call(page: Page):
+    page.on("request", lambda request: print(">>", request.method, request.url))
+    page.on("response", lambda response: print("<<", response.status, response.url))
     yield page
 
-
-@pytest.fixture()
-@pytest.mark.asyncio
-async def set_up_with_trace():
-    async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch()
-        context = await browser.new_context()
-        await context.tracing.start(screenshots=True, snapshots=True, sources=True)
-
-        page = await context.new_page()
-        await page.goto(URL)
-
-        await page.click(Navbar.SIGN_IN_LNK)
-        login_page = Login(page)
-        await login_page.login_with_credentials(user["email"], user["password"])
-
-        yield page
-
-        await context.tracing.stop(path="trace.zip")

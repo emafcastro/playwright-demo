@@ -3,7 +3,7 @@ from playwright.sync_api import Page
 
 class Home:
     # Selectors
-    TITLE_LIST = "a > h1"
+    ARTICLE_LIST = ".article-preview > a"
     FAVORITE_LIST = "[name=favorite]"
     FIRST_FAVORITE = ""
 
@@ -14,8 +14,9 @@ class Home:
 class Navbar:
     # Selectors
     SIGN_IN_LNK = "text=Sign in"
-    PROFILE_LNK = "li >> nth=3 >> a"
-    NEW_POST_LNK = "text=New Post"
+    NEW_ARTICLE_LNK = "text=New Article"
+    SETTINGS_LNK = "text=Settings"
+    LOGOUT_LNK = "body > nav > div > ul > li:nth-child(4) > a"
 
     def __init__(self, page: Page):
         self.page = page
@@ -23,14 +24,17 @@ class Navbar:
 
 class Login:
     # Selectors
-    EMAIL_INPUT = "[placeholder='Email']"
-    PASSWORD_INPUT = "[type=password]"
+    EMAIL_INPUT = "#id_username"
+    PASSWORD_INPUT = "#id_password"
     SIGN_IN_BTN = "button:has-text('Sign in')"
+    ERROR_MESSAGE_DIV = ".error-messages"
 
     def __init__(self, page: Page):
         self.page = page
 
-    async def login_with_credentials(self, email, password):
-        await self.page.fill(self.EMAIL_INPUT, email)
-        await self.page.fill(self.PASSWORD_INPUT, password)
-        await self.page.click(self.SIGN_IN_BTN)
+    def login_with_credentials(self, email, password):
+        """ Manual login on the website """
+        self.page.locator(self.EMAIL_INPUT).fill(email)
+        self.page.focus(self.PASSWORD_INPUT)
+        self.page.locator(self.PASSWORD_INPUT).fill(password)
+        self.page.locator(self.SIGN_IN_BTN).click()
