@@ -1,19 +1,29 @@
 import pytest
-from pages.home_login import Login, Navbar
-from playwright.sync_api import Playwright, sync_playwright, Page, BrowserContext
+from models.home_login import Login, Navbar
+from helpers.user_helper import maketoken
+from playwright.sync_api import sync_playwright, BrowserContext
 
 # URL = "https://realworld-djangoapp.herokuapp.com"
 URL = "http://localhost:8000"
 user = {"username": "automation", "email": "automation@test.com", "password": "Test1234"}
 
-# TODO: Move user dictionary to a json file outside
+# TODO Move user dictionary to a json file outside
 
-# TODO: Investigate how to apply a base_url
+# TODO Investigate how to apply a base_url
 
-# TODO: Investigate a best way to implement fixtures
+# TODO Investigate a best way to implement fixtures
 
 
 """ End to End fixtures """
+
+
+@pytest.fixture()
+def generate_user_context(context: BrowserContext):
+    csrftoken = maketoken(64)
+    token = {"name": "csrftoken", "value": csrftoken, 'path': '/',
+             'domain': 'localhost'}  # TODO Investigate if the same applies for PRD
+    context.add_cookies([token])
+    yield context
 
 
 @pytest.fixture()
@@ -58,11 +68,3 @@ def set_up_with_trace():
         yield page
 
         context.tracing.stop(path="trace.zip")
-
-
-@pytest.fixture()
-def get_api_call(page: Page):
-    page.on("request", lambda request: print(">>", request.method, request.url))
-    page.on("response", lambda response: print("<<", response.status, response.url))
-    yield page
-

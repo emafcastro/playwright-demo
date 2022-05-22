@@ -1,6 +1,6 @@
 import pytest
 
-from pages.home_login import Login, Navbar
+from models.home_login import Login, Navbar
 
 user = {"username": "automation", "email": "automation@test.com", "password": "Test1234"}
 

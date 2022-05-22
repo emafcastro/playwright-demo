@@ -3,12 +3,12 @@ from playwright.sync_api import Page
 
 class Home:
     # Selectors
-    ARTICLE_LIST = ".article-preview > a"
-    FAVORITE_LIST = "[name=favorite]"
-    FIRST_FAVORITE = ""
-
-    def __init__(self, page: Page):
-        self.page = page
+    ARTICLE_LIST = ".article-preview"
+    ARTICLE_TITLES = ".article-preview > a"
+    FAVORITE_LIST = "[title='Add to Favorites']"
+    MY_FEED_LNK = "text='Your Feed'"
+    AUTHOR_LNK = ".author"
+    SIDEBAR_SECTION = ".sidebar"
 
 
 class Navbar:
@@ -17,9 +17,6 @@ class Navbar:
     NEW_ARTICLE_LNK = "text=New Article"
     SETTINGS_LNK = "text=Settings"
     LOGOUT_LNK = "body > nav > div > ul > li:nth-child(4) > a"
-
-    def __init__(self, page: Page):
-        self.page = page
 
 
 class Login:

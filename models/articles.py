@@ -29,3 +29,11 @@ class ArticleDetail:
     DATE_TXT = ".date"
     ARTICLE_CONTENT_TXT = ".article-content"
     LIKE_ARTICLE_BUTTON = "text='Favorite Post'"
+
+
+class Comment:
+    # Selectors
+    DELETE_COMMENT_BTN = ".ion-trash-a"
+    EDIT_COMMENT_BTN = ".ion-edit"
+    COMMENT_LIST = "textarea"
+    SAVE_COMMENT_BTN = "text='Save Comment'"
