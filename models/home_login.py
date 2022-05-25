@@ -15,7 +15,7 @@ class Navbar:
     # Selectors
     SIGN_IN_LNK = "text=Sign in"
     NEW_ARTICLE_LNK = "text=New Article"
-    SETTINGS_LNK = "text=Settings"
+    SETTINGS_LNK = "//li/a[contains(text(), 'Settings')]"
     LOGOUT_LNK = "body > nav > div > ul > li:nth-child(4) > a"
 
 

@@ -1,18 +1,35 @@
 from models.home_login import Home, Navbar
 from helpers.article_helper import add_article, delete_article
 from models.home_login import Login
+import pytest
 
 
-def test_like_an_article(set_up_login):
-    page, context = set_up_login
+@pytest.fixture()
+def after_each_home(set_up_login):
+    page = set_up_login
+    yield page
+
+    context = page.context
+    page.goto("/")
+    url_first_article = page.locator(Home.ARTICLE_TITLES).first.get_attribute("href")
+    id_article = url_first_article.split("/")[2]
+    print(f"Removing article with id: {id_article}")
+    delete_article(context, id_article)
+
+
+def test_like_an_article(after_each_home):
+    """ This test allows a different user to like an article """
+
+    page = after_each_home
+    context = page.context
+
     article_url = add_article(context)
     id_article = article_url.split("/")[2]
     context.clear_cookies()
-    page.reload()
+    page.goto("/")
 
     page.locator(Navbar.SIGN_IN_LNK).nth(0).click()
-    login = Login(page)
-    login.login_with_credentials("like@test.com", "Test1234")
+    Login(page).login_with_credentials("like@test.com", "Test1234")
     page.wait_for_selector("text=Sign Out")
 
     with page.expect_response("**/article/favorite/**", timeout=6000):
@@ -22,7 +39,9 @@ def test_like_an_article(set_up_login):
 
 
 def test_user_can_see_their_feed(set_up_login):
-    page, _ = set_up_login
+    """ This test allows a user to see their feed """
+
+    page = set_up_login
 
     page.locator(Home.MY_FEED_LNK).click()
     author_list = page.locator(Home.AUTHOR_LNK)
@@ -31,18 +50,19 @@ def test_user_can_see_their_feed(set_up_login):
 
 
 def test_length_of_articles_when_one_is_deleted(set_up_login):
-    page, context = set_up_login
+    page = set_up_login
+    context = page.context
 
     article_url = add_article(context)
     path_split = article_url.split("/")[3]
     article_title = path_split.replace("-", " ")
-    page.goto("http://localhost:8000")
+    page.goto("/")
 
     old_length = page.locator(Home.ARTICLE_TITLES).count()
     url_first_article = page.locator(Home.ARTICLE_TITLES).first.get_attribute("href")
     id_article = url_first_article.split("/")[2]
     delete_article(context, id_article)
-    page.goto("http://localhost:8000")
+    page.goto("/")
     new_length = page.locator(Home.ARTICLE_TITLES).count()
 
     assert new_length < old_length
@@ -50,10 +70,12 @@ def test_length_of_articles_when_one_is_deleted(set_up_login):
     assert page.locator(f"text='{article_title}'").is_visible() is False
 
 
-def test_filter_by_tag(set_up_login):
-    page, context = set_up_login
+def test_filter_by_tag(after_each_home):
+    page = after_each_home
+    context = page.context
+
     add_article(context=context, tags="newTag")
-    page.goto("http://localhost:8000")
+    page.goto("/")
 
     with page.expect_response("**/?tag=newTag"):
         page.locator(Home.SIDEBAR_SECTION).locator("text='newTag'").click()

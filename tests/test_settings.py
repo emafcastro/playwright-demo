@@ -8,13 +8,16 @@ import time
 @pytest.fixture()
 def before_each_setting(generate_user_context):
     context = generate_user_context
-    create_user(context)
+    response = create_user(context)
+    print()
     page = context.new_page()
-    page.goto("http://localhost:8000")
+    page.goto(f'{response["hx-redirect"]}')
     yield page
 
 
 def test_change_profile_picture(before_each_setting):
+    """ This test allows the user to change their profile """
+
     page = before_each_setting
     page.locator(Navbar.SETTINGS_LNK).click()
     page.locator(Settings.IMAGE_INPUT).fill(
@@ -25,6 +28,8 @@ def test_change_profile_picture(before_each_setting):
 
 
 def test_change_username(before_each_setting):
+    """ This test allows the user to change their username """
+
     page = before_each_setting
     page.locator(Navbar.SETTINGS_LNK).click()
     page.locator(Settings.NAME_INPUT).fill("EditedName")
@@ -34,6 +39,8 @@ def test_change_username(before_each_setting):
 
 
 def test_change_bio(before_each_setting):
+    """ This test allows the user to change their bio """
+
     page = before_each_setting
     page.locator(Navbar.SETTINGS_LNK).click()
     page.locator(Settings.BIO_INPUT).fill("New Bio")
@@ -43,6 +50,8 @@ def test_change_bio(before_each_setting):
 
 
 def test_change_email(before_each_setting):
+    """ This test allows the user to change their email """
+
     new_mail = f"edited{time.time()}@test.com"
 
     page = before_each_setting
@@ -54,12 +63,14 @@ def test_change_email(before_each_setting):
     page.context.clear_cookies()
 
     login_user_via_api(page.context, new_mail, "Test1234")
-    page.goto("http://localhost:8000")
+    page.goto("")
     page.locator(Navbar.SETTINGS_LNK).click()
     assert page.locator(Settings.EMAIL_INPUT).get_attribute("value") == new_mail
 
 
 def test_change_password(before_each_setting):
+    """ This test allows the user to change their password """
+
     page = before_each_setting
     page.locator(Navbar.SETTINGS_LNK).click()
 
@@ -71,6 +82,6 @@ def test_change_password(before_each_setting):
     page.context.clear_cookies()
 
     login_user_via_api(page.context, email, "Test5678")
-    page.goto("http://localhost:8000/")
+    page.goto("/")
 
     assert page.locator("text=Sign Out").is_visible()
