@@ -9,7 +9,7 @@ import time
 def before_each_setting(generate_user_context):
     context = generate_user_context
     response = create_user(context)
-    print()
+
     page = context.new_page()
     page.goto(f'{response["hx-redirect"]}')
     yield page
@@ -17,14 +17,14 @@ def before_each_setting(generate_user_context):
 
 def test_change_profile_picture(before_each_setting):
     """ This test allows the user to change their profile """
+    image_url = "https://www.goarabic.com/vm/wp-content/uploads/2019/05/dummy-profile-pic.jpg"
 
     page = before_each_setting
     page.locator(Navbar.SETTINGS_LNK).click()
-    page.locator(Settings.IMAGE_INPUT).fill(
-        "https://www.goarabic.com/vm/wp-content/uploads/2019/05/dummy-profile-pic.jpg")
+    page.locator(Settings.IMAGE_INPUT).fill(image_url)
     page.locator(Settings.UPDATE_BUTTON).click()
-    image_url = page.locator("img").get_attribute("src")
-    assert image_url == "https://www.goarabic.com/vm/wp-content/uploads/2019/05/dummy-profile-pic.jpg"
+    profile_image_url = page.locator("img").get_attribute("src")
+    assert profile_image_url == image_url
 
 
 def test_change_username(before_each_setting):
@@ -63,7 +63,7 @@ def test_change_email(before_each_setting):
     page.context.clear_cookies()
 
     login_user_via_api(page.context, new_mail, "Test1234")
-    page.goto("")
+    page.goto("/")
     page.locator(Navbar.SETTINGS_LNK).click()
     assert page.locator(Settings.EMAIL_INPUT).get_attribute("value") == new_mail
 

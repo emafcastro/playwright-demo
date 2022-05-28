@@ -43,7 +43,8 @@ def test_user_can_see_their_feed(set_up_login):
 
     page = set_up_login
 
-    page.locator(Home.MY_FEED_LNK).click()
+    with page.expect_navigation():
+        page.locator(Home.MY_FEED_LNK).click()
     author_list = page.locator(Home.AUTHOR_LNK)
     for index in range(0, author_list.count()):
         assert "automation" in author_list.nth(index).text_content()

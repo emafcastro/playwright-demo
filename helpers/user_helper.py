@@ -1,7 +1,12 @@
+import os
+
 import string
 import random
 import time
 from playwright.sync_api import BrowserContext
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def create_user(context: BrowserContext, email=None, name=None, password="Test1234") -> dict[str, str]:
@@ -21,13 +26,16 @@ def create_user(context: BrowserContext, email=None, name=None, password="Test12
 
 def login_user_via_api(context, email, password):
     csrftoken = maketoken(64)
+    # token = {"name": "csrftoken", "value": csrftoken, 'path': '/',
+    #         'domain': f'{os.environ["DOMAIN"]}'}
     token = {"name": "csrftoken", "value": csrftoken, 'path': '/',
-             'domain': 'localhost'}
+             'domain': "realworld-djangoapp.herokuapp.com"}
     context.add_cookies([token])
     api_context = context.request
 
     user = {"username": email, "password": password, "csrfmiddlewaretoken": csrftoken}
     response = api_context.post("/login/", form=user)
+    print(f"Result of response: {response.ok}")
     return response
 
 

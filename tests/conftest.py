@@ -1,11 +1,13 @@
+import os
+
 import pytest
 from models.home_login import Login, Navbar
-from helpers.user_helper import maketoken
+from helpers.user_helper import maketoken, login_user_via_api
 from playwright.sync_api import sync_playwright, BrowserContext, Page
 
-user = {"username": "automation", "email": "automation@test.com", "password": "Test1234"}
+from dotenv import load_dotenv
 
-# TODO Move user dictionary to a json file outside
+load_dotenv()
 
 # TODO Implement parallel execution
 
@@ -15,23 +17,10 @@ user = {"username": "automation", "email": "automation@test.com", "password": "T
 
 
 @pytest.fixture()
-def generate_user_context(context: BrowserContext):
-    csrftoken = maketoken(64)
-    token = {"name": "csrftoken", "value": csrftoken, 'path': '/',
-             'domain': 'localhost'}  # TODO Investigate if the same applies for PRD
-    context.add_cookies([token])
-    yield context
-    context.close()
-
-
-@pytest.fixture()
 def set_up_login(page: Page):
     """ Fixture to log in with credentials """
+    login_user_via_api(page.context, os.environ["TEST_EMAIL"], os.environ["TEST_PASSWORD"])
     page.goto("/")
-    page.locator(Navbar.SIGN_IN_LNK).click()
-    login_page = Login(page)
-    login_page.login_with_credentials(user["email"], user["password"])
-    page.wait_for_selector("text=Sign Out")
 
     yield page
 
@@ -50,9 +39,24 @@ def set_up_with_trace():
 
         page.click(Navbar.SIGN_IN_LNK)
         login_page = Login(page)
-        login_page.login_with_credentials(user["email"], user["password"])
+        login_page.login_with_credentials(os.environ["TEST_EMAIL"], os.environ["TEST_PASSWORD"])
         page.wait_for_selector("text=Sign Out")
 
         yield page
 
         context.tracing.stop(path="trace.zip")
+
+
+""" API Fixtures """
+
+
+@pytest.fixture()
+def generate_user_context(context: BrowserContext):
+    csrftoken = maketoken(64)
+    # token = {"name": "csrftoken", "value": csrftoken, 'path': '/',
+    #         'domain': f'{os.environ["DOMAIN"]}'}
+    token = {"name": "csrftoken", "value": csrftoken, 'path': '/',
+             'domain': "realworld-djangoapp.herokuapp.com"}
+    context.add_cookies([token])
+    yield context
+    context.close()

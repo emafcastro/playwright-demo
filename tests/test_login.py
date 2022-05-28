@@ -1,16 +1,21 @@
+import os
 import pytest
 
 from models.home_login import Login, Navbar
 from playwright.sync_api import Page
+from dotenv import load_dotenv
 
-user = {"username": "automation", "email": "automation@test.com", "password": "Test1234"}
+load_dotenv()
 
 
 @pytest.mark.login
-def test_login_with_valid_credentials(set_up_login):
+def test_login_with_valid_credentials(page: Page):
     """ Test with valid credentials """
-
-    page = set_up_login
+    page.goto("/")
+    page.locator(Navbar.SIGN_IN_LNK).click()
+    login_page = Login(page)
+    login_page.login_with_credentials(os.environ["TEST_EMAIL"], os.environ["TEST_PASSWORD"])
+    page.wait_for_selector("text=Sign Out")
     assert page.locator("text=Sign Out").is_visible()
 
 

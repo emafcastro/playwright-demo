@@ -8,3 +8,4 @@ annotations.txt
 report.html
 assets
 state.json
+.env
