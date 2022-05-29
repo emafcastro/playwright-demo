@@ -9,8 +9,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# TODO Implement parallel execution
-
 # TODO Implement Report Portal
 
 """ End to End fixtures """
@@ -53,10 +51,8 @@ def set_up_with_trace():
 @pytest.fixture()
 def generate_user_context(context: BrowserContext):
     csrftoken = maketoken(64)
-    # token = {"name": "csrftoken", "value": csrftoken, 'path': '/',
-    #         'domain': f'{os.environ["DOMAIN"]}'}
     token = {"name": "csrftoken", "value": csrftoken, 'path': '/',
-             'domain': "realworld-djangoapp.herokuapp.com"}
+             'domain': f'{os.environ["DOMAIN"]}'}
     context.add_cookies([token])
     yield context
     context.close()

@@ -4,6 +4,7 @@ from models.home_login import Home, Login
 import time
 from datetime import date
 from helpers.article_helper import add_article, edit_article, delete_article
+from helpers.user_helper import login_user_via_api
 import pytest
 
 
@@ -108,7 +109,6 @@ def test_edit_article(after_each_article):
 
 
 def test_like_article_with_different_user(after_each_article):
-    # TODO Investigate a better way to expect for the event that add and removes the class
 
     # Get all information from login
     page = after_each_article
@@ -117,11 +117,10 @@ def test_like_article_with_different_user(after_each_article):
 
     # Delete all cookies
     context.clear_cookies()
-    page.goto("/login/")
-    login_page = Login(page)
-    login_page.login_with_credentials("like@test.com", "Test1234")
-    page.wait_for_selector("text=Sign Out")
+
+    login_user_via_api(context, "like@test.com", "Test1234")
     page.goto(f"{article_url}")
+
     like_article = page.locator(ArticleDetail.LIKE_ARTICLE_BUTTON).first
     like_article.click()
 

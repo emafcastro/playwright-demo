@@ -9,13 +9,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def create_user(context: BrowserContext, email=None, name=None, password="Test1234") -> dict[str, str]:
+def create_user(page_context: BrowserContext, email=None, name=None, password="Test1234") -> dict[str, str]:
     if email is None:
         email = f"automated{time.time()}@test.com"
     if name is None:
         name = f"automated{time.time()}"
-    cookies = context.cookies()
-    api_context = context.request
+    cookies = page_context.cookies()
+    api_context = page_context.request
 
     headers = {'X-CSRFToken': cookies[0]["value"]}
     user = {"email": email, "name": name, "password": password}
@@ -24,18 +24,16 @@ def create_user(context: BrowserContext, email=None, name=None, password="Test12
     return response.headers
 
 
-def login_user_via_api(context, email, password):
+def login_user_via_api(page_context: BrowserContext, email, password):
     csrftoken = maketoken(64)
-    # token = {"name": "csrftoken", "value": csrftoken, 'path': '/',
-    #         'domain': f'{os.environ["DOMAIN"]}'}
     token = {"name": "csrftoken", "value": csrftoken, 'path': '/',
-             'domain': "realworld-djangoapp.herokuapp.com"}
-    context.add_cookies([token])
-    api_context = context.request
+             'domain': f'{os.environ["DOMAIN"]}'}
+    page_context.add_cookies([token])
+    api_context = page_context.request
 
     user = {"username": email, "password": password, "csrfmiddlewaretoken": csrftoken}
     response = api_context.post("/login/", form=user)
-    print(f"Result of response: {response.ok}")
+    print(f"Result of login user response: {response.ok}")
     return response
 
 

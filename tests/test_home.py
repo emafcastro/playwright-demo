@@ -6,6 +6,7 @@ import pytest
 
 @pytest.fixture()
 def after_each_home(set_up_login):
+    """ This fixture deletes the created articles after each execution run """
     page = set_up_login
     yield page
 
@@ -75,7 +76,7 @@ def test_filter_by_tag(after_each_home):
     page = after_each_home
     context = page.context
 
-    add_article(context=context, tags="newTag")
+    add_article(page_context=context, tags="newTag")
     page.goto("/")
 
     with page.expect_response("**/?tag=newTag"):

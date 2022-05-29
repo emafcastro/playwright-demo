@@ -13,10 +13,10 @@ class Home:
 
 class Navbar:
     # Selectors
-    SIGN_IN_LNK = "text=Sign in"
-    NEW_ARTICLE_LNK = "text=New Article"
+    SIGN_IN_LNK = "//li/a[contains(text(),'Sign in')]"
+    NEW_ARTICLE_LNK = "//li/a[contains(text(),'New Article')]"
     SETTINGS_LNK = "//li/a[contains(text(), 'Settings')]"
-    LOGOUT_LNK = "body > nav > div > ul > li:nth-child(4) > a"
+    LOGOUT_LNK = '//li/a[contains(text(),"Sign Out")]'
 
 
 class Login:
